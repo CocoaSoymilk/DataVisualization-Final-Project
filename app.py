@@ -314,7 +314,7 @@ app.layout = dbc.Container([
                                         id='year-slider',
                                         min=min_year,
                                         max=max_year,
-                                        value=[min_year, max_year],
+                                        value=[2020, 2024],
                                         marks={str(year): {'label': str(year), 
                                                            'style': {'font-weight': 'bold', 'font-size': '0.8rem'}} 
                                                for year in years},
