@@ -153,10 +153,13 @@ def create_trend_chart(df_district, selected_districts=None):
         )
     
     fig.update_layout(
-        **COMMON_LAYOUT,
-        title={**TITLE_STYLE, 'text': '<b>📊 연도별 교통사고 발생 추이</b>'},
+        font=COMMON_LAYOUT['font'],
+        plot_bgcolor=COMMON_LAYOUT['plot_bgcolor'],
+        paper_bgcolor=COMMON_LAYOUT['paper_bgcolor'],
+        title={**TITLE_STYLE, 'text': '<b>📊 연도별 교통사고 발생 추이</b>', 'y': 0.98},
         height=480,
         hovermode='x unified',
+        margin={'l': 60, 'r': 60, 't': 90, 'b': 60},  # 상단 여백 증가
         xaxis=dict(
             title='<b>연도</b>',
             showgrid=True,
@@ -178,9 +181,9 @@ def create_trend_chart(df_district, selected_districts=None):
             title='<b>구분</b>',
             orientation="h",
             yanchor="bottom",
-            y=1.02,
+            y=1.05,  # 범례를 더 위로
             xanchor="right",
-            x=1,
+            x=0.98,  # 범례를 약간 왼쪽으로 (우측 정렬 기준)
             bgcolor='rgba(255, 255, 255, 0.95)',
             bordercolor='#3b82f6',
             borderwidth=1,
@@ -191,13 +194,17 @@ def create_trend_chart(df_district, selected_districts=None):
     return fig
 
 
-def create_weather_chart(df_weather):
+def create_weather_chart(df_weather, weather_metric='both'):
     """
     차트 2: 기상별 사고 비율 (Stacked Bar Chart)
     
     선택 이유: 범주형 데이터의 비율을 직관적으로 비교하기 위함
     - 기상 조건별 사고 심각도(사망/부상) 비교
     - 전체 대비 각 기상의 영향도 파악
+    
+    Args:
+        df_weather: 기상 데이터
+        weather_metric: 'deaths' (사망자), 'injuries' (부상자), 'both' (둘 다)
     """
     if len(df_weather) == 0:
         # 빈 차트 반환
@@ -234,36 +241,39 @@ def create_weather_chart(df_weather):
     df_agg['합계'] = df_agg['사망자수'] + df_agg['부상자수']
     df_agg = df_agg.sort_values('합계', ascending=False)
     
-    # 개별 막대 차트로 변경 (사망자와 부상자 구분 표시)
+    # 차트 생성
     fig = go.Figure()
     
-    fig.add_trace(go.Bar(
-        name='사망자',
-        x=df_agg['기상상태'],
-        y=df_agg['사망자수'],
-        marker=dict(color=COLORS['사망'], line=dict(width=1.5, color='white')),
-        text=df_agg['사망자수'],
-        textposition='inside',
-        textfont=dict(size=11, color='white', family='Malgun Gothic'),
-        hovertemplate='<b>사망자</b><br>기상: %{x}<br>인원: %{y:,.0f}명<extra></extra>'
-    ))
+    # 선택된 지표에 따라 표시
+    if weather_metric == 'both' or weather_metric == 'deaths':
+        fig.add_trace(go.Bar(
+            name='사망자',
+            x=df_agg['기상상태'],
+            y=df_agg['사망자수'],
+            marker=dict(color=COLORS['사망'], line=dict(width=1.5, color='white')),
+            text=df_agg['사망자수'],
+            textposition='inside',
+            textfont=dict(size=11, color='white', family='Malgun Gothic'),
+            hovertemplate='<b>사망자</b><br>기상: %{x}<br>인원: %{y:,.0f}명<extra></extra>'
+        ))
     
-    fig.add_trace(go.Bar(
-        name='부상자',
-        x=df_agg['기상상태'],
-        y=df_agg['부상자수'],
-        marker=dict(color=COLORS['부상'], line=dict(width=1.5, color='white')),
-        text=df_agg['부상자수'],
-        textposition='inside',
-        textfont=dict(size=11, color='white', family='Malgun Gothic'),
-        hovertemplate='<b>부상자</b><br>기상: %{x}<br>인원: %{y:,.0f}명<extra></extra>'
-    ))
+    if weather_metric == 'both' or weather_metric == 'injuries':
+        fig.add_trace(go.Bar(
+            name='부상자',
+            x=df_agg['기상상태'],
+            y=df_agg['부상자수'],
+            marker=dict(color=COLORS['부상'], line=dict(width=1.5, color='white')),
+            text=df_agg['부상자수'],
+            textposition='inside',
+            textfont=dict(size=11, color='white', family='Malgun Gothic'),
+            hovertemplate='<b>부상자</b><br>기상: %{x}<br>인원: %{y:,.0f}명<extra></extra>'
+        ))
     
     fig.update_layout(
         **COMMON_LAYOUT,
         title={**TITLE_STYLE, 'text': '<b>🌤️ 기상 상태별 사고 피해 현황</b>'},
         height=480,
-        barmode='group',
+        barmode='group' if weather_metric == 'both' else 'overlay',
         xaxis=dict(
             title='<b>기상 상태</b>',
             tickangle=-45,
@@ -335,8 +345,9 @@ def create_vehicle_chart(df_vehicle):
             line=dict(color='white', width=3)
         ),
         textposition='auto',
-        textinfo='label+percent',
-        textfont=dict(size=13, color='white', family='Malgun Gothic'),
+        textinfo='label+percent+value',  # 라벨, 퍼센트, 값 모두 표시
+        texttemplate='<b>%{label}</b><br>%{percent}<br>%{value:,.0f}건',  # 포맷 지정
+        textfont=dict(size=11, color='white', family='Malgun Gothic'),
         hovertemplate='<b>%{label}</b><br>사고: %{value:,.0f}건<br>비율: %{percent}<extra></extra>',
         pull=[0.05 if i == 0 else 0 for i in range(len(df_agg))],  # 가장 큰 조각 강조
         rotation=90,  # 텍스트 회전 각도 조정
@@ -346,7 +357,7 @@ def create_vehicle_chart(df_vehicle):
     fig.update_layout(
         **COMMON_LAYOUT,
         title={**TITLE_STYLE, 'text': '<b>🚗 차량 용도별 사고 발생 비율</b>'},
-        height=480,
+        height=700,
         showlegend=True,
         legend=dict(
             orientation="v",
@@ -430,9 +441,12 @@ def create_heatmap_chart(df_district):
     ))
     
     fig.update_layout(
-        **COMMON_LAYOUT,
-        title={**TITLE_STYLE, 'text': '<b>🗺️ 자치구별 연도별 사고 발생 히트맵</b>'},
-        height=600,
+        font=COMMON_LAYOUT['font'],
+        plot_bgcolor=COMMON_LAYOUT['plot_bgcolor'],
+        paper_bgcolor=COMMON_LAYOUT['paper_bgcolor'],
+        title={**TITLE_STYLE, 'text': '<b>🗺️ 자치구별 연도별 사고 발생 히트맵</b>', 'y': 0.98},
+        height=800,  # 높이 증가
+        margin={'l': 100, 'r': 100, 't': 100, 'b': 60},  # 상단 여백 증가
         xaxis=dict(
             title='<b>연도</b>',
             side='top',
@@ -508,14 +522,15 @@ def create_ranking_chart(df_district, top_n=10):
         paper_bgcolor=COMMON_LAYOUT['paper_bgcolor'],
         title={**TITLE_STYLE, 'text': f'<b>⚠️ 교통사고 다발 자치구 TOP {top_n} ({latest_year}년)</b>'},
         height=600,
-        margin={'l': 80, 'r': 100, 't': 70, 'b': 60},  # 우측 여백 증가
+        margin={'l': 80, 'r': 150, 't': 70, 'b': 60},  # 우측 여백 더 증가하여 수치 잘림 방지
         xaxis=dict(
             title='<b>사고 건수 (건)</b>',
             showgrid=True,
             gridwidth=0.5,
             gridcolor='#e5e7eb',
             color='#64748b',
-            linecolor='#cbd5e1'
+            linecolor='#cbd5e1',
+            range=[0, df_top['발생건수'].max() * 1.15]  # x축 범위를 15% 더 확장
         ),
         yaxis=dict(
             title='',
@@ -746,6 +761,29 @@ def create_map_chart(df_district, map_metric='사상자수'):
             zoom=10,
             opacity=0.7
         )
+        
+        # 자치구 이름 텍스트 추가
+        for feature in seoul_geo['features']:
+            district_name = feature['properties']['name']
+            # 자치구의 중심 좌표 계산 (간단한 평균)
+            coords = feature['geometry']['coordinates'][0]
+            if isinstance(coords[0][0], list):  # MultiPolygon 처리
+                coords = coords[0]
+            lons = [c[0] for c in coords]
+            lats = [c[1] for c in coords]
+            center_lon = sum(lons) / len(lons)
+            center_lat = sum(lats) / len(lats)
+            
+            # 텍스트 추가
+            fig.add_scattermapbox(
+                lon=[center_lon],
+                lat=[center_lat],
+                mode='text',
+                text=[district_name.replace('구', '')],
+                textfont=dict(size=10, color='#1e293b', family='Malgun Gothic'),
+                hoverinfo='skip',
+                showlegend=False
+            )
         
         # 레이아웃 업데이트 (COMMON_LAYOUT의 margin과 충돌하지 않도록 별도 처리)
         fig.update_layout(
