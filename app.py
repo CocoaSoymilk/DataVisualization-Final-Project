@@ -374,7 +374,7 @@ app.layout = html.Div([
                                style={"color": "#64748b", "font-size": "0.75rem", "letter-spacing": "1px"}),
                         html.H2([
                             html.Span(f"{min_year}~{max_year}",
-                                     style={"color": "#0891b2", "font-weight": "700", "font-size": "1.8rem"})
+                                     style={"color": "#0891b2", "font-weight": "700"})
                         ], style={"margin": "10px 0"})
                     ], style={"text-align": "center"})
                 ], style={
@@ -455,11 +455,10 @@ app.layout = html.Div([
                         dcc.RadioItems(
                             id='weather-metric-radio',
                             options=[
-                                {'label': ' 사망자 + 부상자', 'value': 'both'},
-                                {'label': ' 사망자만', 'value': 'deaths'},
-                                {'label': ' 부상자만', 'value': 'injuries'}
+                                {'label': ' 사망자', 'value': 'deaths'},
+                                {'label': ' 부상자', 'value': 'injuries'}
                             ],
-                            value='both',
+                            value='deaths',
                             inline=True,
                             style={"margin-bottom": "10px"},
                             labelStyle={"margin-right": "15px"}

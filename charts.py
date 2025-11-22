@@ -500,18 +500,19 @@ def create_heatmap_chart(df_district):
         font=COMMON_LAYOUT['font'],
         plot_bgcolor=COMMON_LAYOUT['plot_bgcolor'],
         paper_bgcolor=COMMON_LAYOUT['paper_bgcolor'],
-        title={**TITLE_STYLE, 'text': '<b>🗺️ 자치구별 연도별 사고 발생 히트맵</b>', 'y': 0.95},
+        title={**TITLE_STYLE, 'text': '<b>🗺️ 자치구별 연도별 사고 발생 히트맵</b>', 'y': 0.92, 'x': 0.5},
         height=650,  # 높이 감소하여 컨테이너에 맞춤
-        margin={'l': 80, 'r': 80, 't': 90, 'b': 40},  # 상단 여백 증가하여 제목과 축 겹침 방지
+        margin={'l': 80, 'r': 80, 't': 100, 'b': 40},  # 상단 여백 더 증가
         autosize=True,  # 자동 크기 조정
         xaxis=dict(
             title='<b>연도</b>',
             side='top',
             tickfont=dict(size=11, color='#64748b'),
+            titlefont=dict(size=12, color='#64748b'),
             dtick=1,
             color='#94a3b8',
             linecolor='#374151',
-            standoff=10  # x축과 제목 사이 간격
+            standoff=15  # x축과 제목 사이 간격 증가
         ),
         yaxis=dict(
             title='<b>자치구</b>',
@@ -737,7 +738,7 @@ def create_map_chart(df_district, map_metric='total'):
         # 서울시 자치구 GeoJSON 로드 (인터넷에서)
         print("🗺️ GeoJSON 다운로드 중...")
         geojson_url = "https://raw.githubusercontent.com/southkorea/seoul-maps/master/kostat/2013/json/seoul_municipalities_geo_simple.json"
-        response = requests.get(geojson_url, timeout=30)  # 타임아웃 30초로 증가
+        response = requests.get(geojson_url, timeout=60)  # 타임아웃 60초로 증가 (Render 환경 고려)
         response.raise_for_status()  # HTTP 에러 체크
         seoul_geo = response.json()
         print(f"✓ GeoJSON 다운로드 완료! ({len(seoul_geo.get('features', []))}개 자치구)")
