@@ -495,10 +495,12 @@ app.layout = html.Div([
                         "자치구 × 연도 히트맵"
                     ]),
                     dbc.CardBody([
-                        dcc.Graph(id='heatmap-chart', config={'displayModeBar': False},
-                                 style={"height": "700px", "width": "100%"})
-                    ], style={"overflow": "hidden"})
-                ], className="mb-3", style={"overflow": "hidden"})
+                        html.Div([
+                            dcc.Graph(id='heatmap-chart', config={'displayModeBar': False},
+                                     style={"height": "650px", "width": "100%"})
+                        ], style={"max-height": "650px", "overflow": "hidden"})
+                    ], style={"padding": "10px", "overflow": "hidden"})
+                ], className="mb-3", style={"max-height": "730px", "overflow": "hidden"})
             ], width=12, lg=6, md=12),
         ]),
         
