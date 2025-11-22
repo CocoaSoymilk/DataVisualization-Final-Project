@@ -246,25 +246,30 @@ def create_weather_chart(df_weather, weather_metric='both'):
     
     # 선택된 지표에 따라 표시 (하나만 표시)
     if weather_metric == 'both':
-        fig.add_trace(go.Bar(
-            name='사망자',
-            x=df_agg['기상상태'],
-            y=df_agg['사망자수'],
-            marker=dict(color=COLORS['사망'], line=dict(width=1.5, color='white')),
-            text=df_agg['사망자수'],
-            textposition='inside',
-            textfont=dict(size=11, color='white', family='Malgun Gothic'),
-            hovertemplate='<b>사망자</b><br>기상: %{x}<br>인원: %{y:,.0f}명<extra></extra>'
-        ))
+        # 이중 축 사용: 부상자(왼쪽), 사망자(오른쪽)
         fig.add_trace(go.Bar(
             name='부상자',
             x=df_agg['기상상태'],
             y=df_agg['부상자수'],
             marker=dict(color=COLORS['부상'], line=dict(width=1.5, color='white')),
             text=df_agg['부상자수'],
-            textposition='inside',
-            textfont=dict(size=11, color='white', family='Malgun Gothic'),
-            hovertemplate='<b>부상자</b><br>기상: %{x}<br>인원: %{y:,.0f}명<extra></extra>'
+            textposition='outside',
+            textfont=dict(size=10, color=COLORS['부상'], family='Malgun Gothic'),
+            hovertemplate='<b>부상자</b><br>기상: %{x}<br>인원: %{y:,.0f}명<extra></extra>',
+            yaxis='y'
+        ))
+        fig.add_trace(go.Scatter(
+            name='사망자',
+            x=df_agg['기상상태'],
+            y=df_agg['사망자수'],
+            mode='lines+markers+text',
+            line=dict(color=COLORS['사망'], width=3),
+            marker=dict(size=10, color=COLORS['사망'], line=dict(width=2, color='white')),
+            text=df_agg['사망자수'],
+            textposition='top center',
+            textfont=dict(size=11, color=COLORS['사망'], family='Malgun Gothic'),
+            hovertemplate='<b>사망자</b><br>기상: %{x}<br>인원: %{y:,.0f}명<extra></extra>',
+            yaxis='y2'
         ))
     elif weather_metric == 'deaths':
         fig.add_trace(go.Bar(
@@ -291,27 +296,19 @@ def create_weather_chart(df_weather, weather_metric='both'):
             showlegend=False
         ))
     
-    fig.update_layout(
+    # 레이아웃 설정
+    layout_config = {
         **COMMON_LAYOUT,
-        title={**TITLE_STYLE, 'text': '<b>🌤️ 기상 상태별 사고 피해 현황</b>'},
-        height=480,
-        barmode='group' if weather_metric == 'both' else 'overlay',
-        xaxis=dict(
+        'title': {**TITLE_STYLE, 'text': '<b>🌤️ 기상 상태별 사고 피해 현황</b>'},
+        'height': 480,
+        'xaxis': dict(
             title='<b>기상 상태</b>',
             tickangle=-45,
             showgrid=False,
             color='#64748b',
             linecolor='#cbd5e1'
         ),
-        yaxis=dict(
-            title='<b>인원 (명)</b>',
-            showgrid=True,
-            gridwidth=0.5,
-            gridcolor='#e5e7eb',
-            color='#64748b',
-            linecolor='#cbd5e1'
-        ),
-        legend=dict(
+        'legend': dict(
             title='<b>구분</b>',
             orientation="h",
             yanchor="bottom",
@@ -322,10 +319,48 @@ def create_weather_chart(df_weather, weather_metric='both'):
             bordercolor='#3b82f6',
             borderwidth=1,
             font=dict(color='#1e293b')
-        ),
-        bargap=0.2,
-        bargroupgap=0.1
-    )
+        )
+    }
+    
+    # both 모드일 때 이중 축 설정
+    if weather_metric == 'both':
+        layout_config.update({
+            'barmode': 'overlay',
+            'yaxis': dict(
+                title='<b>부상자 (명)</b>',
+                titlefont=dict(color=COLORS['부상']),
+                tickfont=dict(color=COLORS['부상']),
+                showgrid=True,
+                gridwidth=0.5,
+                gridcolor='#e5e7eb',
+                color='#64748b',
+                linecolor='#cbd5e1'
+            ),
+            'yaxis2': dict(
+                title='<b>사망자 (명)</b>',
+                titlefont=dict(color=COLORS['사망']),
+                tickfont=dict(color=COLORS['사망']),
+                overlaying='y',
+                side='right',
+                showgrid=False,
+                color='#64748b',
+                linecolor='#cbd5e1'
+            )
+        })
+    else:
+        layout_config.update({
+            'barmode': 'overlay',
+            'yaxis': dict(
+                title='<b>인원 (명)</b>',
+                showgrid=True,
+                gridwidth=0.5,
+                gridcolor='#e5e7eb',
+                color='#64748b',
+                linecolor='#cbd5e1'
+            )
+        })
+    
+    fig.update_layout(**layout_config)
     
     return fig
 
@@ -465,9 +500,9 @@ def create_heatmap_chart(df_district):
         font=COMMON_LAYOUT['font'],
         plot_bgcolor=COMMON_LAYOUT['plot_bgcolor'],
         paper_bgcolor=COMMON_LAYOUT['paper_bgcolor'],
-        title={**TITLE_STYLE, 'text': '<b>🗺️ 자치구별 연도별 사고 발생 히트맵</b>', 'y': 0.97},
+        title={**TITLE_STYLE, 'text': '<b>🗺️ 자치구별 연도별 사고 발생 히트맵</b>', 'y': 0.95},
         height=650,  # 높이 감소하여 컨테이너에 맞춤
-        margin={'l': 80, 'r': 80, 't': 80, 'b': 40},  # 여백 감소
+        margin={'l': 80, 'r': 80, 't': 90, 'b': 40},  # 상단 여백 증가하여 제목과 축 겹침 방지
         autosize=True,  # 자동 크기 조정
         xaxis=dict(
             title='<b>연도</b>',
@@ -475,7 +510,8 @@ def create_heatmap_chart(df_district):
             tickfont=dict(size=11, color='#64748b'),
             dtick=1,
             color='#94a3b8',
-            linecolor='#374151'
+            linecolor='#374151',
+            standoff=10  # x축과 제목 사이 간격
         ),
         yaxis=dict(
             title='<b>자치구</b>',
