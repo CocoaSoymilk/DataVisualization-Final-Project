@@ -244,8 +244,8 @@ def create_weather_chart(df_weather, weather_metric='both'):
     # 차트 생성
     fig = go.Figure()
     
-    # 선택된 지표에 따라 표시
-    if weather_metric == 'both' or weather_metric == 'deaths':
+    # 선택된 지표에 따라 표시 (하나만 표시)
+    if weather_metric == 'both':
         fig.add_trace(go.Bar(
             name='사망자',
             x=df_agg['기상상태'],
@@ -256,8 +256,6 @@ def create_weather_chart(df_weather, weather_metric='both'):
             textfont=dict(size=11, color='white', family='Malgun Gothic'),
             hovertemplate='<b>사망자</b><br>기상: %{x}<br>인원: %{y:,.0f}명<extra></extra>'
         ))
-    
-    if weather_metric == 'both' or weather_metric == 'injuries':
         fig.add_trace(go.Bar(
             name='부상자',
             x=df_agg['기상상태'],
@@ -267,6 +265,30 @@ def create_weather_chart(df_weather, weather_metric='both'):
             textposition='inside',
             textfont=dict(size=11, color='white', family='Malgun Gothic'),
             hovertemplate='<b>부상자</b><br>기상: %{x}<br>인원: %{y:,.0f}명<extra></extra>'
+        ))
+    elif weather_metric == 'deaths':
+        fig.add_trace(go.Bar(
+            name='사망자',
+            x=df_agg['기상상태'],
+            y=df_agg['사망자수'],
+            marker=dict(color=COLORS['사망'], line=dict(width=1.5, color='white')),
+            text=df_agg['사망자수'],
+            textposition='auto',
+            textfont=dict(size=12, color='white', family='Malgun Gothic'),
+            hovertemplate='<b>사망자</b><br>기상: %{x}<br>인원: %{y:,.0f}명<extra></extra>',
+            showlegend=False
+        ))
+    elif weather_metric == 'injuries':
+        fig.add_trace(go.Bar(
+            name='부상자',
+            x=df_agg['기상상태'],
+            y=df_agg['부상자수'],
+            marker=dict(color=COLORS['부상'], line=dict(width=1.5, color='white')),
+            text=df_agg['부상자수'],
+            textposition='auto',
+            textfont=dict(size=12, color='white', family='Malgun Gothic'),
+            hovertemplate='<b>부상자</b><br>기상: %{x}<br>인원: %{y:,.0f}명<extra></extra>',
+            showlegend=False
         ))
     
     fig.update_layout(
@@ -344,10 +366,9 @@ def create_vehicle_chart(df_vehicle):
             colors=[COLORS.get(x, '#34495e') for x in df_agg['차종']],
             line=dict(color='white', width=3)
         ),
-        textposition='auto',
-        textinfo='label+percent+value',  # 라벨, 퍼센트, 값 모두 표시
-        texttemplate='<b>%{label}</b><br>%{percent}<br>%{value:,.0f}건',  # 포맷 지정
-        textfont=dict(size=11, color='white', family='Malgun Gothic'),
+        textposition='inside',
+        textinfo='label',  # 라벨만 표시
+        textfont=dict(size=13, color='white', family='Malgun Gothic', weight='bold'),
         hovertemplate='<b>%{label}</b><br>사고: %{value:,.0f}건<br>비율: %{percent}<extra></extra>',
         pull=[0.05 if i == 0 else 0 for i in range(len(df_agg))],  # 가장 큰 조각 강조
         rotation=90,  # 텍스트 회전 각도 조정
@@ -778,13 +799,13 @@ def create_map_chart(df_district, map_metric='total'):
             center_lon = sum(lons) / len(lons)
             center_lat = sum(lats) / len(lats)
             
-            # 텍스트 추가
+            # 텍스트 추가 (구 포함)
             fig.add_scattermapbox(
                 lon=[center_lon],
                 lat=[center_lat],
                 mode='text',
-                text=[district_name.replace('구', '')],
-                textfont=dict(size=10, color='#1e293b', family='Malgun Gothic'),
+                text=[district_name],
+                textfont=dict(size=10, color='#1e293b', family='Malgun Gothic', weight='bold'),
                 hoverinfo='skip',
                 showlegend=False
             )

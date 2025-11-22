@@ -254,58 +254,6 @@ app.layout = html.Div([
             )
         ], style={"margin-bottom": "30px"}),
         
-        # 지도 지표 선택
-        html.Div([
-            html.Label([
-                html.I(className="fas fa-chart-bar", 
-                       style={"margin-right": "8px", "color": "#3b82f6"}),
-                "지도 지표"
-            ], style={
-                "font-weight": "bold",
-                "font-size": "0.95rem",
-                "color": "#1e293b",
-                "margin-bottom": "10px",
-                "display": "block"
-            }),
-            dcc.Dropdown(
-                id='map-metric-dropdown',
-                options=[
-                    {'label': '총 사상자 수', 'value': 'total'},
-                    {'label': '사망자 수', 'value': 'deaths'},
-                    {'label': '부상자 수', 'value': 'injuries'},
-                    {'label': '발생 건수', 'value': 'count'}
-                ],
-                value='total',
-                clearable=False,
-                style={"font-size": "0.9rem"}
-            )
-        ], style={"margin-bottom": "30px"}),
-        
-        # 기상 차트 지표 선택
-        html.Div([
-            html.Label([
-                html.I(className="fas fa-chart-pie", 
-                       style={"margin-right": "8px", "color": "#3b82f6"}),
-                "기상 차트 표시"
-            ], style={
-                "font-weight": "bold",
-                "font-size": "0.95rem",
-                "color": "#1e293b",
-                "margin-bottom": "10px",
-                "display": "block"
-            }),
-            dcc.RadioItems(
-                id='weather-metric-radio',
-                options=[
-                    {'label': ' 사망자 + 부상자', 'value': 'both'},
-                    {'label': ' 사망자만', 'value': 'deaths'},
-                    {'label': ' 부상자만', 'value': 'injuries'}
-                ],
-                value='both',
-                style={"font-size": "0.85rem"},
-                labelStyle={"display": "block", "margin-bottom": "8px"}
-            )
-        ], style={"margin-bottom": "30px"}),
         
         # 푸터 정보
         html.Hr(style={"border-color": "#3b82f6", "opacity": "0.3", "margin-top": "30px"}),
@@ -424,8 +372,10 @@ app.layout = html.Div([
                                style={"color": "#06b6d4", "margin-bottom": "10px"}),
                         html.H6("PERIOD",
                                style={"color": "#64748b", "font-size": "0.75rem", "letter-spacing": "1px"}),
-                        html.H2(f"{max_year - min_year + 1}년",
-                                style={"color": "#0891b2", "font-weight": "700", "margin": "10px 0"})
+                        html.H2([
+                            html.Span(f"{min_year}~{max_year}",
+                                     style={"color": "#0891b2", "font-weight": "700", "font-size": "1.8rem"})
+                        ], style={"margin": "10px 0"})
                     ], style={"text-align": "center"})
                 ], style={
                     "border": "2px solid #06b6d4",
@@ -445,6 +395,18 @@ app.layout = html.Div([
                         "서울시 자치구별 지도"
                     ]),
                     dbc.CardBody([
+                        dcc.Dropdown(
+                            id='map-metric-dropdown',
+                            options=[
+                                {'label': '총 사상자 수', 'value': 'total'},
+                                {'label': '사망자 수', 'value': 'deaths'},
+                                {'label': '부상자 수', 'value': 'injuries'},
+                                {'label': '발생 건수', 'value': 'count'}
+                            ],
+                            value='total',
+                            clearable=False,
+                            style={"margin-bottom": "10px"}
+                        ),
                         dcc.Graph(id='map-chart', config={'displayModeBar': False},
                                  style={"height": "500px"})
                     ])
@@ -490,8 +452,20 @@ app.layout = html.Div([
                         "기상별 분석"
                     ]),
                     dbc.CardBody([
+                        dcc.RadioItems(
+                            id='weather-metric-radio',
+                            options=[
+                                {'label': ' 사망자 + 부상자', 'value': 'both'},
+                                {'label': ' 사망자만', 'value': 'deaths'},
+                                {'label': ' 부상자만', 'value': 'injuries'}
+                            ],
+                            value='both',
+                            inline=True,
+                            style={"margin-bottom": "10px"},
+                            labelStyle={"margin-right": "15px"}
+                        ),
                         dcc.Graph(id='weather-chart', config={'displayModeBar': False},
-                                 style={"height": "500px"})
+                                 style={"height": "470px"})
                     ])
                 ], className="mb-3")
             ], width=12, lg=6, md=12),
@@ -522,9 +496,9 @@ app.layout = html.Div([
                     ]),
                     dbc.CardBody([
                         dcc.Graph(id='heatmap-chart', config={'displayModeBar': False},
-                                 style={"height": "700px"})
-                    ])
-                ], className="mb-3")
+                                 style={"height": "700px", "width": "100%"})
+                    ], style={"overflow": "hidden"})
+                ], className="mb-3", style={"overflow": "hidden"})
             ], width=12, lg=6, md=12),
         ]),
         
