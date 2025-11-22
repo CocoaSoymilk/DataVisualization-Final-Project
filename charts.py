@@ -433,7 +433,7 @@ def create_heatmap_chart(df_district):
         hovertemplate='<b>자치구</b>: %{y}<br><b>연도</b>: %{x}<br><b>사고</b>: %{z:,.0f}건<extra></extra>',
         colorbar=dict(
             title="<b>사고 건수</b>",
-            titlefont=dict(size=13),
+            title_font=dict(size=13),  # ✅ 수정: titlefont → title_font
             tickfont=dict(size=12),
             thickness=20,
             len=0.7
@@ -647,7 +647,7 @@ def create_comparison_chart(df_district, selected_districts=None):
     return fig
 
 
-def create_map_chart(df_district, map_metric='사상자수'):
+def create_map_chart(df_district, map_metric='total'):
     """
     차트 7: 서울시 자치구별 교통사고 Choropleth 지도
     
@@ -658,7 +658,7 @@ def create_map_chart(df_district, map_metric='사상자수'):
     
     Args:
         df_district: 자치구별 데이터프레임
-        map_metric: 표시할 지표 ('사상자수', '사망자수', '발생건수')
+        map_metric: 표시할 지표 ('total', 'deaths', 'injuries', 'count')
     """
     if len(df_district) == 0:
         # 빈 차트 반환
@@ -713,18 +713,22 @@ def create_map_chart(df_district, map_metric='사상자수'):
             print(f"⚠️ 매칭되지 않는 자치구: {unmatched}")
         
         # 표시할 지표 선택
-        if map_metric == '사상자수':
+        if map_metric == 'total':
             color_column = '사상자수'
             color_label = '사상자 수 (명)'
-            title_text = f'<b>🗺️ 서울시 자치구별 총 사상자 수</b>'
-        elif map_metric == '사망자수':
+            title_text = '<b>🗺️ 서울시 자치구별 총 사상자 수</b>'
+        elif map_metric == 'deaths':
             color_column = '사망자수'
             color_label = '사망자 수 (명)'
-            title_text = f'<b>🗺️ 서울시 자치구별 총 사망자 수</b>'
-        else:  # 발생건수
+            title_text = '<b>🗺️ 서울시 자치구별 총 사망자 수</b>'
+        elif map_metric == 'injuries':
+            color_column = '부상자수'
+            color_label = '부상자 수 (명)'
+            title_text = '<b>🗺️ 서울시 자치구별 총 부상자 수</b>'
+        else:  # count
             color_column = '발생건수'
             color_label = '발생 건수 (건)'
-            title_text = f'<b>🗺️ 서울시 자치구별 총 사고 발생 건수</b>'
+            title_text = '<b>🗺️ 서울시 자치구별 총 사고 발생 건수</b>'
         
         # Choropleth Mapbox 생성
         fig = px.choropleth_mapbox(
@@ -795,7 +799,7 @@ def create_map_chart(df_district, map_metric='사상자수'):
             margin={'l': 10, 'r': 10, 't': 70, 'b': 10},
             coloraxis_colorbar=dict(
                 title=f'<b>{color_label}</b>',
-                titlefont=dict(size=13, color='#1e40af'),
+                title_font=dict(size=13, color='#1e40af'),  # ✅ 수정: titlefont → title_font
                 tickfont=dict(size=12, color='#1e293b'),
                 thickness=20,
                 len=0.7,
