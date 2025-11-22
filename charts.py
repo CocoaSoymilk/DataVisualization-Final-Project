@@ -505,10 +505,9 @@ def create_heatmap_chart(df_district):
         margin={'l': 80, 'r': 80, 't': 100, 'b': 40},  # 상단 여백 더 증가
         autosize=True,  # 자동 크기 조정
         xaxis=dict(
-            title='<b>연도</b>',
+            title=dict(text='<b>연도</b>', font=dict(size=12, color='#64748b')),
             side='top',
             tickfont=dict(size=11, color='#64748b'),
-            titlefont=dict(size=12, color='#64748b'),
             dtick=1,
             color='#94a3b8',
             linecolor='#374151',
