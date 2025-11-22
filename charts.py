@@ -194,7 +194,7 @@ def create_trend_chart(df_district, selected_districts=None):
     return fig
 
 
-def create_weather_chart(df_weather, weather_metric='both'):
+def create_weather_chart(df_weather, weather_metric='deaths'):
     """
     차트 2: 기상별 사고 비율 (Stacked Bar Chart)
     
@@ -204,7 +204,7 @@ def create_weather_chart(df_weather, weather_metric='both'):
     
     Args:
         df_weather: 기상 데이터
-        weather_metric: 'deaths' (사망자), 'injuries' (부상자), 'both' (둘 다)
+        weather_metric: 'deaths' (사망자), 'injuries' (부상자)
     """
     if len(df_weather) == 0:
         # 빈 차트 반환
@@ -244,34 +244,8 @@ def create_weather_chart(df_weather, weather_metric='both'):
     # 차트 생성
     fig = go.Figure()
     
-    # 선택된 지표에 따라 표시 (하나만 표시)
-    if weather_metric == 'both':
-        # 이중 축 사용: 부상자(왼쪽), 사망자(오른쪽)
-        fig.add_trace(go.Bar(
-            name='부상자',
-            x=df_agg['기상상태'],
-            y=df_agg['부상자수'],
-            marker=dict(color=COLORS['부상'], line=dict(width=1.5, color='white')),
-            text=df_agg['부상자수'],
-            textposition='outside',
-            textfont=dict(size=10, color=COLORS['부상'], family='Malgun Gothic'),
-            hovertemplate='<b>부상자</b><br>기상: %{x}<br>인원: %{y:,.0f}명<extra></extra>',
-            yaxis='y'
-        ))
-        fig.add_trace(go.Scatter(
-            name='사망자',
-            x=df_agg['기상상태'],
-            y=df_agg['사망자수'],
-            mode='lines+markers+text',
-            line=dict(color=COLORS['사망'], width=3),
-            marker=dict(size=10, color=COLORS['사망'], line=dict(width=2, color='white')),
-            text=df_agg['사망자수'],
-            textposition='top center',
-            textfont=dict(size=11, color=COLORS['사망'], family='Malgun Gothic'),
-            hovertemplate='<b>사망자</b><br>기상: %{x}<br>인원: %{y:,.0f}명<extra></extra>',
-            yaxis='y2'
-        ))
-    elif weather_metric == 'deaths':
+    # 선택된 지표에 따라 표시
+    if weather_metric == 'deaths':
         fig.add_trace(go.Bar(
             name='사망자',
             x=df_agg['기상상태'],
@@ -297,18 +271,27 @@ def create_weather_chart(df_weather, weather_metric='both'):
         ))
     
     # 레이아웃 설정
-    layout_config = {
+    fig.update_layout(
         **COMMON_LAYOUT,
-        'title': {**TITLE_STYLE, 'text': '<b>🌤️ 기상 상태별 사고 피해 현황</b>'},
-        'height': 480,
-        'xaxis': dict(
+        title={**TITLE_STYLE, 'text': '<b>🌤️ 기상 상태별 사고 피해 현황</b>'},
+        height=480,
+        barmode='overlay',
+        xaxis=dict(
             title='<b>기상 상태</b>',
             tickangle=-45,
             showgrid=False,
             color='#64748b',
             linecolor='#cbd5e1'
         ),
-        'legend': dict(
+        yaxis=dict(
+            title='<b>인원 (명)</b>',
+            showgrid=True,
+            gridwidth=0.5,
+            gridcolor='#e5e7eb',
+            color='#64748b',
+            linecolor='#cbd5e1'
+        ),
+        legend=dict(
             title='<b>구분</b>',
             orientation="h",
             yanchor="bottom",
@@ -320,47 +303,7 @@ def create_weather_chart(df_weather, weather_metric='both'):
             borderwidth=1,
             font=dict(color='#1e293b')
         )
-    }
-    
-    # both 모드일 때 이중 축 설정
-    if weather_metric == 'both':
-        layout_config.update({
-            'barmode': 'overlay',
-            'yaxis': dict(
-                title='<b>부상자 (명)</b>',
-                titlefont=dict(color=COLORS['부상']),
-                tickfont=dict(color=COLORS['부상']),
-                showgrid=True,
-                gridwidth=0.5,
-                gridcolor='#e5e7eb',
-                color='#64748b',
-                linecolor='#cbd5e1'
-            ),
-            'yaxis2': dict(
-                title='<b>사망자 (명)</b>',
-                titlefont=dict(color=COLORS['사망']),
-                tickfont=dict(color=COLORS['사망']),
-                overlaying='y',
-                side='right',
-                showgrid=False,
-                color='#64748b',
-                linecolor='#cbd5e1'
-            )
-        })
-    else:
-        layout_config.update({
-            'barmode': 'overlay',
-            'yaxis': dict(
-                title='<b>인원 (명)</b>',
-                showgrid=True,
-                gridwidth=0.5,
-                gridcolor='#e5e7eb',
-                color='#64748b',
-                linecolor='#cbd5e1'
-            )
-        })
-    
-    fig.update_layout(**layout_config)
+    )
     
     return fig
 

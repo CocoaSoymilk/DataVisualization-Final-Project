@@ -610,7 +610,7 @@ def update_charts(year_range, selected_districts, selected_weather, map_metric, 
         return (
             create_map_chart(df_district, 'total'),
             create_trend_chart(df_district, []),
-            create_weather_chart(df_weather, 'both'),
+            create_weather_chart(df_weather, 'deaths'),
             create_vehicle_chart(df_vehicle),
             create_heatmap_chart(df_district),
             create_ranking_chart(df_district),
