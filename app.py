@@ -49,6 +49,9 @@ app = dash.Dash(
     suppress_callback_exceptions=True
 )
 
+# ✅ Render 배포를 위한 server 변수 추가
+server = app.server
+
 app.title = "서울시 교통사고 대시보드"
 
 # 커스텀 스타일
@@ -640,6 +643,7 @@ def update_charts(year_range, selected_districts, selected_weather, map_metric, 
         )
 
 
+# ✅ 배포용으로 수정
 if __name__ == '__main__':
     print("\n" + "=" * 70)
     print("🚀 대시보드 실행 중...")
@@ -648,5 +652,4 @@ if __name__ == '__main__':
     print("⏹️  종료: Ctrl + C")
     print("=" * 70 + "\n")
     
-    app.run(debug=True, host='127.0.0.1', port=8050)
-
+    app.run_server(debug=False, host='0.0.0.0', port=8050)
