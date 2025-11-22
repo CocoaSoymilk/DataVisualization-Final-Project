@@ -446,21 +446,21 @@ def create_heatmap_chart(df_district):
         title={
             **TITLE_STYLE, 
             'text': '<b>🗺️ 자치구별 연도별 사고 발생 히트맵</b>', 
-            'y': 0.88,  # 제목을 더 아래로 (0.92 → 0.88)
+            'y': 0.96,  # 제목을 위로 (0.88 → 0.96)
             'x': 0.5,
-            'yanchor': 'bottom'  # 제목 기준점을 하단으로
+            'yanchor': 'top'  # 제목 기준점을 상단으로 변경
         },
         height=650,  # 높이 감소하여 컨테이너에 맞춤
-        margin={'l': 80, 'r': 80, 't': 120, 'b': 40},  # 상단 여백 더 증가 (100 → 120)
+        margin={'l': 80, 'r': 80, 't': 80, 'b': 60},  # 상단 여백 감소, 하단 여백 증가 (차트를 아래로 이동)
         autosize=True,  # 자동 크기 조정
         xaxis=dict(
             title=dict(
                 text='<b>연도</b>', 
-                font=dict(size=11, color='#64748b'),  # 폰트 크기 감소
-                standoff=20  # 간격 증가 (15 → 20)
+                font=dict(size=11, color='#64748b'),
+                standoff=20  # 간격 유지
             ),
             side='top',
-            tickfont=dict(size=10, color='#64748b'),  # 틱 폰트 크기 감소
+            tickfont=dict(size=10, color='#64748b'),
             dtick=1,
             color='#94a3b8',
             linecolor='#374151'
