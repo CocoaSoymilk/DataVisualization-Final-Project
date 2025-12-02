@@ -140,34 +140,4 @@ requests>=2.31.0
 ### 상세 분석 차트
 ![Detail Charts](docs/screenshot_charts.png)
 
-## 🤝 기여
 
-이슈나 풀 리퀘스트는 언제든 환영합니다!
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📝 라이센스
-
-이 프로젝트는 MIT 라이센스 하에 배포됩니다.
-
-## 👤 제작자
-
-**[Your Name]**
-
-## 🙏 감사의 말
-
-- 서울 열린데이터광장 - 데이터 제공
-- Plotly 커뮤니티 - 시각화 도구
-- Dash 프레임워크 - 대시보드 프레임워크
-
-## 📞 문의
-
-프로젝트에 대한 질문이나 제안사항이 있으시면 이슈를 등록해주세요.
-
----
-
-⭐ 이 프로젝트가 도움이 되셨다면 Star를 눌러주세요!
